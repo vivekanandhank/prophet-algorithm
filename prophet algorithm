@@ -1,0 +1,44 @@
+import pandas as pd                                     # importing libraries
+import numpy as np
+from fbprophet import Prophet
+import matplotlib.pyplot as plt
+ 
+%matplotlib inline
+
+
+df = pd.read_csv()                      # reading your dataset
+
+df = df.reset_index()                   # reseting the index
+
+df=df.rename(columns={'Date':'ds', 'Close':'y'})       # predicting the columns
+df.set_index('ds').y.plot()
+
+promotions = pd.DataFrame({                                 # creating the dataframe by omitting the holidays
+  'holiday': 'december_promotion',
+  'ds': pd.to_datetime(['2009-12-01', '2010-12-01', '2011-12-01', '2012-12-01',
+                        '2013-12-01', '2014-12-01', '2015-12-01']),
+  'lower_window': 0,
+  'upper_window': 0,
+})
+
+df['y'] = np.log(df['y'])                                   # implementing log transform
+
+model = Prophet(holidays=promotions)                         # implementing prophet model
+model.fit(df);
+future = model.make_future_dataframe(periods=24, freq = 'm')
+forecast = model.predict(future)
+forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail()
+model.plot(forecast);
+
+model.plot_components(forecast);
+
+xtrain, xtest, ytrain, ytest = train_test_split(ds, y, test_size=0.33, random_state=42)   # splitting training and test set
+model.fit(xtrain, ytrain)
+
+#Train Set Graph
+plt.scatter(xtrain, ytrain, color='yellow', label= 'Actual Price') #plotting the initial datapoints
+plt.plot(xtrain, regressor.predict(xtrain), color='blue', linewidth=3, label = 'Predicted Price') #plotting the line made by linear regression
+plt.title('Prophet| Time vs. Price')
+plt.legend()
+plt.xlabel('Date Integer')
+plt.show()
